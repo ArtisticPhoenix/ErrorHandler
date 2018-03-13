@@ -16,10 +16,10 @@ namespace evo\errorhandler\Exception;
 class ShutdownError extends \Exception implements \evo\errorhandler\Exception\ErrorHandlerExceptionInterface
 {
 
-	/**
-	 * @var int
-	 */
-	const ERROR_CODE = 2000;
+    /**
+     * @var int
+     */
+    const ERROR_CODE = 2000;
 
     /**
      *

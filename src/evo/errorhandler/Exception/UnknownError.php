@@ -16,10 +16,10 @@ namespace evo\errorhandler\Exception;
 class UnknownError extends \Exception implements \evo\errorhandler\Exception\ErrorHandlerExceptionInterface
 {
 
-	/**
-	 * @var int
-	 */
-	const ERROR_CODE = 0;
+    /**
+     * @var int
+     */
+    const ERROR_CODE = 0;
 
     /**
      *
