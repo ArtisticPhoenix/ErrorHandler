@@ -1,6 +1,8 @@
 <?php
 namespace evo\shutdown;
 
+use evo\errorhandler\Exception\ShutdownError;
+
 /**
  *
  * (c) 2016 Hugh Durham III
@@ -77,27 +79,31 @@ final class ErrorHandler{
     public function handleShutdown()
     {
         $lasterror = error_get_last();
-        if (is_null($lasterror) || empty($lasterror['type']) || !(error_reporting() & $lasterror['type'])) {
+        if (is_null($lasterror) || empty($lasterror['type']) || !$this->canHandle($lasterror['type'])) {
             // This error code is not included in error_reporting
             return;
         }
         
-        /*try {
-            throw new \Exception(
+        try {
+            throw new (
                 $lasterror['message'],
-                ErrorException::SHUTDOWN_ERROR,
+                ShutdownError::,
                 $lasterror['type'],
                 $lasterror['file'],
                 $lasterror['line']
            );
         } catch (\Evo\Core\Error\ErrorException $e) {
             self::_handle($e);
-        }*/
+        }
     }
     
-    public function canHandle($type)
+    public function canHandle($severity)
     {
+        $fatal = E_ERROR | E_PARSE | E_COMPILE_ERROR | E_USER_ERROR;
         
+        if($fatal & $severity || error_reporting() & $severity) return true;
+        
+        return false;
     }
     
 }

@@ -1,5 +1,5 @@
 {
-	"name" : "evo/shutdown",
+	"name" : "evo/errorhandler",
 	"description" : "Exception/Error/Shutdown handler",
 	"type" : "library",
 	"license" : "GPL-3.0",
@@ -8,7 +8,10 @@
 	],
 	"autoload" : {
 		"psr-4" : {
-			"evo\\shutdown\\" : "src/evo/shutdown"
+			"evo\\" : [
+				"src/evo",
+				"src/evo/errorhandler"
+			]
 		}
 	},
 	"support" : {

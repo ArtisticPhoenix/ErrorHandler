@@ -1,4 +1,6 @@
 <?php
 
 
-echo ini_get('upload_tmp_dir');
+echo "<pre>";
+
+print_r(get_defined_constants(true));
