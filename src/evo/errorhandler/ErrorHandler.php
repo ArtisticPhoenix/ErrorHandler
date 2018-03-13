@@ -12,7 +12,7 @@ namespace evo\shutdown;
  * @subpackage Shutdown
  *
  */
-final class Shutdown{
+final class ErrorHandler{
     
     /**
      * @var self
