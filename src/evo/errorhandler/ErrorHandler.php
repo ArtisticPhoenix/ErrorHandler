@@ -2,6 +2,9 @@
 namespace evo\errorhandler;
 
 
+use evo\errorhandler\Exception\RuntimeError;
+use evo\errorhandler\Exception\ShutdownError;
+
 /**
  *
  * (c) 2016 Hugh Durham III
@@ -39,23 +42,23 @@ final class ErrorHandler{
     protected static $INSTANCE;
     
     protected $serverityNames = array(
-        'EVERYTHING'            => -1,
-        'ERROR'                 => E_ERROR,
-        'RECOVERABLE_ERROR'     => E_RECOVERABLE_ERROR,
-        'WARNING'               => E_WARNING,
-        'PARSE'                 => E_PARSE,
-        'NOTICE'                => E_NOTICE,
-        'STRICT'                => E_STRICT,
-        'DEPRECATED'            => E_DEPRECATED,
-        'CORE_ERROR'            => E_CORE_ERROR,
-        'CORE_WARNING'          => E_CORE_WARNING,
-        'COMPILE_ERROR'         => E_COMPILE_ERROR,
-        'COMPILE_WARNING'       => E_COMPILE_WARNING,
-        'EVO_ERROR'             => E_USER_ERROR,
-        'EVO_WARNING'           => E_USER_WARNING,
-        'EVO_NOTICE'            => E_USER_NOTICE,
-        'EVO_DEPRECATED'        => E_USER_DEPRECATED,
-        'ALL'                   => E_ALL,
+        -1                      => 'FATAL ERROR',
+        E_ERROR                 => 'FATAL ERROR',
+        E_RECOVERABLE_ERROR     => 'RECOVERABLE_ERROR',
+        E_WARNING               => 'WARNING',
+        E_PARSE                 => 'PARSE',
+        E_NOTICE                => 'NOTICE',
+        E_STRICT                => 'STRICT',
+        E_DEPRECATED            => 'DEPRECATED',
+        E_CORE_ERROR            => 'CORE_ERROR',
+        E_CORE_WARNING          => 'CORE_WARNING',
+        E_COMPILE_ERROR         => 'COMPILE_ERROR',
+        E_COMPILE_WARNING       => 'COMPILE_WARNING',
+        E_USER_ERROR            => 'EVO_ERROR',
+        E_USER_WARNING          => 'EVO_WARNING',
+        E_USER_NOTICE           => 'EVO_NOTICE',
+        E_USER_DEPRECATED       => 'EVO_DEPRECATED',
+        E_ALL                   => 'FATAL ERROR'
     );
     
     /**
@@ -128,9 +131,70 @@ final class ErrorHandler{
     
     /**
      * 
-     * @param callable $callback
+     * @param int $severity
      */
-    public function regesterCallback($callback){
+    public function getSeverityName($severity){
+        if(!isset($this->serverityNames[$severity])) $severity = 1;      
+        return $this->serverityNames[$severity];
+    }
+    
+    /**
+     * regester a callback that fires on handling an error
+     * 
+     * Callbacks should at least one argument which impliments the throwable interface
+     * function(\Throwable $e){ }
+     * Returning True from the callback indicates that the Exception was handled and 
+     * skips executing any other callbacks in the stack.
+     * 
+     * @param callable $callback - any callable (callable typehint avalible PHP 5.4+)
+     * @param string $id - a unique identifier to insure only one instnace is regestered
+     * @param int $severity - level to handle (simular to error_reporting())
+     * @param int $priority - sort order ASC, lower numbers execute first
+     * @param array $args - additional arguments to pass to the error handler
+     * 
+     * @return bool - regestered or not.
+     */
+    public function regesterCallback(callable $callback, $id = null, $severity = -1, $priority = 50, array $args = array()){
+        if(!$id){
+            $id = uniqid(null, true);
+        }
+        
+        if(isset($this->callbacks[$id])) return false;
+        
+        $this->callbacks[$id] = [
+            'callback'  => $callback,
+            'severity'  => $severity,
+            'priority'  => $priority,
+            'args'      => $args
+        ];
+        
+        usort($this->callbacks, function($a, $b){
+            if ($a == $b) {
+                return 0;
+            }
+            return ($a < $b) ? -1 : 1;
+        });
+        
+        return true;
+    }
+    
+    /**
+     * un-regester a callback by it's id
+     * 
+     * @param string $id
+     */
+    public function unRegesterCallback($id){
+        
+    }
+    
+    /**
+     * get a callback
+     * 
+     * if $id is null, get all callbacks.
+     * 
+     * @param mixed $id
+     */
+    public function getCallback($id=null){
         
     }
     
@@ -179,24 +243,38 @@ final class ErrorHandler{
         });
     }*/
     
-    
-    public function handle($message = "", $type="", $code = 2000, $severity = E_ERROR, $filename = 'unknown', $lineno = 'unknown'){
-        
-    }
-
-    /**
-     * we cant type hint $e because of the \Error|\Exception class
-     *
-     * @param \Exception $e
-     */
+   /**
+    * Main exception handling function
+    * 
+    * All errors wind up here
+    * @todo Throwable typehint avalible PHP 7+, \Error avalible PHP7+
+    * 
+    * @param \Throwable $e 
+    */
     public function handleException($e)
-    {
-        $severity = E_ERROR;
-        
-        if(is_a($e, "\\ErrorException")){
-            $e->getSeverity();
+    { 
+        if(!is_a($e, \Exception::class) && !is_a($e, '\\Error', false)){
+            //php 5.6 fallback.
+            throw new RuntimeError('Argument 1 passed to '.__METHOD__.' must be an instance of \Throwable');
+            return false;
         }
+ 
+        $severity = E_ERROR; 
+        if(is_a($e, \ErrorException::class)){
+            $severity = $e->getSeverity();
+        }
+        $severityName = $this->getSeverityName($severity);
         
+        
+        foreach ($this->callbacks as $callback){
+            
+            
+          //  if(call_user_func_array())
+            
+            
+        }
+
+        echo $severityName . "\n";
     }
 
     /**
@@ -214,13 +292,13 @@ final class ErrorHandler{
         }
         
         //throw 
-        throw new \ErrorException(
+        throw new RuntimeError(
             $message,
-            1,
+            RuntimeError::ERROR_CODE,
             $severity,
             $file,
             $line
-        );  
+        );
     }
 
     /**
@@ -228,10 +306,7 @@ final class ErrorHandler{
      */
     public function handleShutdown()
     {
-       // print_r(__METHOD__."\n");
         $lasterror = error_get_last();
-        
-        print_r($lasterror);
 
         if (is_null($lasterror) || empty($lasterror['type']) || !$this->canHandle($lasterror['type'])) {
             // This error code is not included in error_reporting
@@ -239,7 +314,7 @@ final class ErrorHandler{
         }
         
         //convert to exception
-        /*try{
+        try{
             throw new ShutdownError(
                 $lasterror['message'],
                 ShutdownError::ERROR_CODE,
@@ -249,9 +324,14 @@ final class ErrorHandler{
             );
         }catch(ShutdownError $e){
             $this->handleException($e);
-        }*/
+        }
     }
     
+    /**
+     * 
+     * @param int $severity
+     * @return boolean
+     */
     public function canHandle($severity)
     {
         $fatal = E_ERROR | E_PARSE | E_COMPILE_ERROR | E_USER_ERROR;
