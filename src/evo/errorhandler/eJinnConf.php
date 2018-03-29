@@ -2,11 +2,11 @@
 
 return [
     "author"        => "ArtisticPhoenix",
-    "description"   => "eJinn The Exception Genie",
+    "description"   => "Error and Shutdown handler",
     "package"       => "Evo",
     "subpackage"    => "ErrorHandler",
     "_buildpath"     => ["psr"=>4],
-    "support"       => "https://github.com/ArtisticPhoenix/eJinn/issues",
+    "support"       => "https://github.com/ArtisticPhoenix/ErrorHandler/issues",
     "version"       => "1.0.0",
     "reserved"       => [1,2,[8,20]],
     "namespaces"     => [
