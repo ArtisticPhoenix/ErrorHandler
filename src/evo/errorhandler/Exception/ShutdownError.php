@@ -11,9 +11,9 @@ namespace evo\errorhandler\Exception;
  * @link https://github.com/ArtisticPhoenix/eJinn/issues
  * @varsion 1.0.0
  * @eJinn:buildVersion 1.0.0
- * @eJinn:buildTime 1522309684.673
+ * @eJinn:buildTime 1522310011.1623
  */
-class ShutdownError extends \ErrorException implements \evo\errorhandler\Exception\errorhandlerExceptionInterface
+class ShutdownError extends \ErrorException implements \evo\errorhandler\Exception\ErrorHandlerExceptionInterface
 {
 
 	/**

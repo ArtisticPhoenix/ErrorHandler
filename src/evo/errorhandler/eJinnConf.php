@@ -16,10 +16,10 @@ return [
             "extends"       => "\\ErrorException",
             "severity"      => E_ERROR,
             "interfaces"    => [
-                "errorhandlerExceptionInterface"
+                "ErrorHandlerExceptionInterface"
             ],
             'implements' =>[
-                 'evo\\errorhandler\\Exception\\errorhandlerExceptionInterface'
+                 'evo\\errorhandler\\Exception\\ErrorHandlerExceptionInterface'
             ],
             "exceptions" => [
                 900 => 'ShutdownError',
