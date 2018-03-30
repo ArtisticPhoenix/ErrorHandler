@@ -1,5 +1,6 @@
 <?php
-use evo\errorhandler\ErrorHandler;
+use evo\shutdown\ErrorHandler;
+use evo\shutdown\callback\DynamicCallback;
 //error_reporting(E_ALL ^ E_DEPRECATED);
 error_reporting(-1);
 ini_set('display_errors', 1);
@@ -28,20 +29,18 @@ echo "Loaded\n";
 /*set_time_limit(1);
 sleep(2);*/
 
+$A = new DynamicCallback(function(){
+    echo "A\n";
+}, 'A');
 
-class test{
-    function testCallback(){
-        echo __FUNCTION__;
-        
-    }
-}
+$A->setPriority(1);
 
-$T = new test();
+$B = new DynamicCallback(function(){
+    echo "B\n";
+}, 'B');
 
-$ErrorHandler->regesterCallback([$T,'testCallback'], null, -1, 100);
-$ErrorHandler->regesterCallback([$T,'testCallback']);
-
-$ErrorHandler->handleException($T);
+$ErrorHandler->regesterCallback($B);
+$ErrorHandler->regesterCallback($A);
 
 trigger_error("Test", E_USER_DEPRECATED);
 

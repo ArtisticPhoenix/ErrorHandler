@@ -16,10 +16,10 @@ namespace evo\shutdown\exception;
 class RuntimeError extends \ErrorException implements \evo\shutdown\exception\ShutdownExceptionInterface
 {
 
-	/**
-	 * @var int
-	 */
-	const ERROR_CODE = 909;
+    /**
+     * @var int
+     */
+    const ERROR_CODE = 909;
 
     /**
      *

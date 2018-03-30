@@ -16,10 +16,10 @@ namespace evo\shutdown\exception;
 class InvalidCallback extends \ErrorException implements \evo\shutdown\exception\ShutdownExceptionInterface
 {
 
-	/**
-	 * @var int
-	 */
-	const ERROR_CODE = 999;
+    /**
+     * @var int
+     */
+    const ERROR_CODE = 999;
 
     /**
      *

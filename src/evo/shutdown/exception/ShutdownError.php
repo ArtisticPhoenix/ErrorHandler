@@ -16,10 +16,10 @@ namespace evo\shutdown\exception;
 class ShutdownError extends \ErrorException implements \evo\shutdown\exception\ShutdownExceptionInterface
 {
 
-	/**
-	 * @var int
-	 */
-	const ERROR_CODE = 900;
+    /**
+     * @var int
+     */
+    const ERROR_CODE = 900;
 
     /**
      *
