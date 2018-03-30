@@ -1,9 +1,9 @@
 <?php
-namespace evo\errorhandler;
+namespace evo\shutdown;
 
 
-use evo\errorhandler\Exception\RuntimeError;
-use evo\errorhandler\Exception\ShutdownError;
+use evo\shutdown\Exception\RuntimeError;
+use evo\shutdown\Exception\ShutdownError;
 
 /**
  *
@@ -18,32 +18,38 @@ use evo\errorhandler\Exception\ShutdownError;
  */
 final class ErrorHandler{
     
-    /**
+    /*
      * 
      * @var string
-     */
+     *
     const ENV_PRODUCTION = 'production';
     
     /**
      *
      * @var string
-     */
+     *
     const ENV_TESTING = 'testing';
     
     /**
      *
      * @var string
-     */
+     *
     const ENV_DEVELOPMENT = 'development';
+    */
     
     /**
      * @var self
      */
     protected static $INSTANCE;
     
+    /**
+     * H Readable severity names
+     * 
+     * @var array
+     */
     protected $serverityNames = array(
-        -1                      => 'FATAL ERROR',
-        E_ERROR                 => 'FATAL ERROR',
+        -1                      => 'FATAL_ERROR',
+        E_ERROR                 => 'FATAL_ERROR',
         E_RECOVERABLE_ERROR     => 'RECOVERABLE_ERROR',
         E_WARNING               => 'WARNING',
         E_PARSE                 => 'PARSE',
@@ -58,14 +64,15 @@ final class ErrorHandler{
         E_USER_WARNING          => 'EVO_WARNING',
         E_USER_NOTICE           => 'EVO_NOTICE',
         E_USER_DEPRECATED       => 'EVO_DEPRECATED',
-        E_ALL                   => 'FATAL ERROR'
+        E_ALL                   => 'FATAL_ERROR'
     );
     
-    /**
+    /*
      *
      * @var string
-     */
+     *
     protected $enviroment;
+    */
     
     /**
      * 
@@ -85,8 +92,8 @@ final class ErrorHandler{
      */
     private function __construct()
     {
-        $this->setEnvironment();
-        
+        //$this->setEnvironment();
+        //regester out custom handlers.
         register_shutdown_function([$this,"handleShutdown"]);
         set_error_handler([$this,"handleError"]);
         set_exception_handler([$this, "handleException"]);
@@ -138,7 +145,9 @@ final class ErrorHandler{
         return $this->serverityNames[$severity];
     }
     
-    /**
+    public function regesterCallback(Callback)
+    
+    /*
      * regester a callback that fires on handling an error
      * 
      * Callbacks should at least one argument which impliments the throwable interface
@@ -153,7 +162,7 @@ final class ErrorHandler{
      * @param array $args - additional arguments to pass to the error handler
      * 
      * @return bool - regestered or not.
-     */
+     *
     public function regesterCallback(callable $callback, $id = null, $severity = -1, $priority = 50, array $args = array()){
         if(!$id){
             $id = uniqid(null, true);
@@ -162,7 +171,7 @@ final class ErrorHandler{
         if(isset($this->callbacks[$id])) return false;
         
         $this->callbacks[$id] = [
-            'callback'  => $callback,
+            'exec'       => $callback,
             'severity'  => $severity,
             'priority'  => $priority,
             'args'      => $args
@@ -176,15 +185,29 @@ final class ErrorHandler{
         });
         
         return true;
+    }*/
+    
+    /**
+     * Is the call back regestered
+     * 
+     * @param int $id
+     * @return bool
+     */
+    public function hasCallback($id){
+        return isset($this->callbacks[$id]);
     }
     
     /**
      * un-regester a callback by it's id
      * 
      * @param string $id
+     * @return bool - false if the callback was not exists
      */
     public function unRegesterCallback($id){
+        if(!$this->hasCallback[$id]) return false;
         
+        unset($this->callbacks[$id]);
+        return true;
     }
     
     /**
@@ -195,6 +218,8 @@ final class ErrorHandler{
      * @param mixed $id
      */
     public function getCallback($id=null){
+        if(!$id) return $this->callbacks;
+        
         
     }
     
@@ -264,20 +289,20 @@ final class ErrorHandler{
             $severity = $e->getSeverity();
         }
         $severityName = $this->getSeverityName($severity);
-        
-        
+ 
         foreach ($this->callbacks as $callback){
-            
-            
-          //  if(call_user_func_array())
-            
-            
+            $args = array_merge([$e], $callback['args']);
+           
+            if(call_user_func_array($callback['callback'], $args)){
+                return true;
+            } 
         }
 
         echo $severityName . "\n";
     }
 
     /**
+     * handle all error & throw exceptions for them
      * 
      * @param int $severity
      * @param string $message
@@ -286,12 +311,7 @@ final class ErrorHandler{
      */
     public function handleError($severity, $message, $file = 'unknown', $line = 'unknown')
     {
-        //print_r(__METHOD__."\n");
-        if(!$this->canHandle($severity)){
-            return;
-        }
-        
-        //throw 
+        //throw all uncought errors as a RuntimeError > child of ErrorException
         throw new RuntimeError(
             $message,
             RuntimeError::ERROR_CODE,
@@ -302,14 +322,14 @@ final class ErrorHandler{
     }
 
     /**
-     * 
+     * handle the shutdown
      */
     public function handleShutdown()
     {
         $lasterror = error_get_last();
 
-        if (is_null($lasterror) || empty($lasterror['type']) || !$this->canHandle($lasterror['type'])) {
-            // This error code is not included in error_reporting
+        if (is_null($lasterror) || empty($lasterror['type'])) {
+            // This is not an error, but a normal shutdown
             return;
         }
         
@@ -323,6 +343,8 @@ final class ErrorHandler{
                 $lasterror['line']
             );
         }catch(ShutdownError $e){
+            //we have to catch it to put it in handle as this is 
+            //the shutdown.  But this normalizes the errors.
             $this->handleException($e);
         }
     }
@@ -331,7 +353,7 @@ final class ErrorHandler{
      * 
      * @param int $severity
      * @return boolean
-     */
+     *
     public function canHandle($severity)
     {
         $fatal = E_ERROR | E_PARSE | E_COMPILE_ERROR | E_USER_ERROR;
@@ -341,8 +363,6 @@ final class ErrorHandler{
         return false;
     }
     
-    /*
-     * 
 
    /**
      * helper for exception handling - normalze errors
@@ -428,37 +448,38 @@ final class ErrorHandler{
                 return  'Object('.get_class($arg).')';
         }
     }
-    
+/*
+    PHP7 exception tree
+Throwable
     Error
-      ArithmeticError
-        DivisionByZeroError
-      AssertionError
-      ParseError
-      TypeError
-        ArgumentCountError
+        ArithmeticError
+            DivisionByZeroError
+        AssertionError
+        ParseError
+        TypeError
+            ArgumentCountError
     Exception
-      ClosedGeneratorException
-      DOMException
-      ErrorException
-      IntlException
-      LogicException
-        BadFunctionCallException
-          BadMethodCallException
-        DomainException
-        InvalidArgumentException
-        LengthException
-        OutOfRangeException
-      PharException
-      ReflectionException
-      RuntimeException
-        OutOfBoundsException
-        OverflowException
-        PDOException
-        RangeException
-        UnderflowException
-        UnexpectedValueException
-      SodiumExceptio
-    
+        ClosedGeneratorException
+        DOMException
+        ErrorException
+        IntlException
+        LogicException
+            BadFunctionCallException
+                BadMethodCallException
+            DomainException
+            InvalidArgumentException
+            LengthException
+            OutOfRangeException
+        PharException
+        ReflectionException
+        RuntimeException
+            OutOfBoundsException
+            OverflowException
+            PDOException
+            RangeException
+            UnderflowException
+            UnexpectedValueException
+        SodiumException
      */
     
 }
