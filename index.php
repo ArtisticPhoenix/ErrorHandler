@@ -10,8 +10,8 @@ if(!defined('EVO_AUTOLOAD')){
 
 require EVO_AUTOLOAD;
 
-//http://localhost/ErrorHandler/index.php?config=C%3A%5CUniServerZ%5Cwww%5CErrorHandler%5Csrc%5Cevo%5Cerrorhandler%5CeJinnConf.php
-//require __DIR__.'/vendor/evo/ejinn/index.php'; exit();
+http://localhost/Shutdown/index.php?config=C%3A%5CUniServerZ%5Cwww%5CShutdown%5Csrc%5Cevo%5Cshutdown%5CeJinnConf.php
+require __DIR__.'/vendor/evo/ejinn/index.php'; exit();
 
 echo "<pre>";
 

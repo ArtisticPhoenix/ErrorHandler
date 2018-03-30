@@ -1,5 +1,5 @@
 {
-	"name" : "evo/errorhandler",
+	"name" : "evo/shutdown",
 	"description" : "Exception/Error/Shutdown handler",
 	"type" : "library",
 	"license" : "GPL-3.0",
@@ -8,9 +8,7 @@
 	],
 	"autoload" : {
 		"psr-4" : {
-			"evo\\" : [
-				"src/evo"
-			]
+			"evo\\" : "src/evo"
 		}
 	},
 	"support" : {
@@ -20,12 +18,8 @@
 		"issues" : "https://github.com/ArtisticPhoenix/Shutdown/issues"
 	},
 	"require" : {
-<<<<<<< HEAD
-		"php" : "^5.6",
+		"php" : ">=5.6",
 		"evo/ejinn" : "dev-master"
-=======
-		"php" : ">=5.6"
->>>>>>> branch 'master' of https://github.com/ArtisticPhoenix/ErrorHandler.git
 	},
 	"authors" : [{
 			"name" : "Hugh Durham III",
