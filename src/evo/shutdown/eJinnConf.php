@@ -21,8 +21,9 @@ return [
                     'evo\\shutdown\\exception\\ShutdownExceptionInterface'
             ],
             "exceptions" => [
-                "900"  => "ShutdownException",
-                "909"  => "RuntimeError",
+                "900"   => "ShutdownException",
+                "909"   => "RuntimeError",
+                "999"   => "InvalidCallback"
             ]
         ]
     ]

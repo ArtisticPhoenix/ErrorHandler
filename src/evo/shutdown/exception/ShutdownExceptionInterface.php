@@ -11,7 +11,7 @@ namespace evo\shutdown\exception;
  * @link https://github.com/ArtisticPhoenix/Shutdown/issues
  * @varsion 1.0.0
  * @eJinn:buildVersion 1.0.0
- * @eJinn:buildTime 1522389342.0661
+ * @eJinn:buildTime 1522395344.3061
  */
 interface ShutdownExceptionInterface
 {

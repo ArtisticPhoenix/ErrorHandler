@@ -1,15 +1,16 @@
 <?php
 namespace evo\shutdown;
 
-
-use evo\shutdown\Exception\RuntimeError;
-use evo\shutdown\Exception\ShutdownError;
+use evo\shutdown\Exception as E;
+use evo\shutdown\callback\CallbackInterface;
 
 /**
  *
  * (c) 2016 Hugh Durham III
  *
  * For license information please view the LICENSE file included with this source code.
+ * 
+ * Throwing errors from within the error handler is generally a bad idea.
  *
  * @author HughDurham {ArtisticPhoenix}
  * @package Evo
@@ -17,26 +18,6 @@ use evo\shutdown\Exception\ShutdownError;
  *
  */
 final class ErrorHandler{
-    
-    /*
-     * 
-     * @var string
-     *
-    const ENV_PRODUCTION = 'production';
-    
-    /**
-     *
-     * @var string
-     *
-    const ENV_TESTING = 'testing';
-    
-    /**
-     *
-     * @var string
-     *
-    const ENV_DEVELOPMENT = 'development';
-    */
-    
     /**
      * @var self
      */
@@ -67,13 +48,6 @@ final class ErrorHandler{
         E_ALL                   => 'FATAL_ERROR'
     );
     
-    /*
-     *
-     * @var string
-     *
-    protected $enviroment;
-    */
-    
     /**
      * 
      * @var array
@@ -92,7 +66,6 @@ final class ErrorHandler{
      */
     private function __construct()
     {
-        //$this->setEnvironment();
         //regester out custom handlers.
         register_shutdown_function([$this,"handleShutdown"]);
         set_error_handler([$this,"handleError"]);
@@ -111,31 +84,6 @@ final class ErrorHandler{
         return self::$INSTANCE;
     }
     
-  
-   /**
-    * 
-    * @param string $environment - one of the ENV_* constants
-    */
-    public function setEnvironment($environment = self::ENV_PRODUCTION){
-        switch ($environment){
-            case self::ENV_DEVELOPMENT:
-            case self::ENV_TESTING:
-                $this->enviroment = $environment;
-            break;
-            default:
-                $this->enviroment = self::ENV_PRODUCTION;
-            break;     
-        }    
-    }
-    
-    /**
-     * 
-     * @return string
-     */
-    public function getEnvironment(){
-        return $this->enviroment;
-    }
-    
     /**
      * 
      * @param int $severity
@@ -145,47 +93,14 @@ final class ErrorHandler{
         return $this->serverityNames[$severity];
     }
     
-    public function regesterCallback(Callback)
-    
-    /*
-     * regester a callback that fires on handling an error
+    /**
      * 
-     * Callbacks should at least one argument which impliments the throwable interface
-     * function(\Throwable $e){ }
-     * Returning True from the callback indicates that the Exception was handled and 
-     * skips executing any other callbacks in the stack.
-     * 
-     * @param callable $callback - any callable (callable typehint avalible PHP 5.4+)
-     * @param string $id - a unique identifier to insure only one instnace is regestered
-     * @param int $severity - level to handle (simular to error_reporting())
-     * @param int $priority - sort order ASC, lower numbers execute first
-     * @param array $args - additional arguments to pass to the error handler
-     * 
-     * @return bool - regestered or not.
-     *
-    public function regesterCallback(callable $callback, $id = null, $severity = -1, $priority = 50, array $args = array()){
-        if(!$id){
-            $id = uniqid(null, true);
-        }
+     * @param CallbackInterface $Callback
+     * @return boolean - can regester callback
+     */
+    public function regesterCallback(CallbackInterface $Callback){
         
-        if(isset($this->callbacks[$id])) return false;
-        
-        $this->callbacks[$id] = [
-            'exec'       => $callback,
-            'severity'  => $severity,
-            'priority'  => $priority,
-            'args'      => $args
-        ];
-        
-        usort($this->callbacks, function($a, $b){
-            if ($a == $b) {
-                return 0;
-            }
-            return ($a < $b) ? -1 : 1;
-        });
-        
-        return true;
-    }*/
+    }
     
     /**
      * Is the call back regestered
@@ -280,7 +195,7 @@ final class ErrorHandler{
     { 
         if(!is_a($e, \Exception::class) && !is_a($e, '\\Error', false)){
             //php 5.6 fallback.
-            throw new RuntimeError('Argument 1 passed to '.__METHOD__.' must be an instance of \Throwable');
+            throw new E\RuntimeError('Argument 1 passed to '.__METHOD__.' must be an instance of \Throwable');
             return false;
         }
  
@@ -312,9 +227,9 @@ final class ErrorHandler{
     public function handleError($severity, $message, $file = 'unknown', $line = 'unknown')
     {
         //throw all uncought errors as a RuntimeError > child of ErrorException
-        throw new RuntimeError(
+        throw new E\RuntimeError(
             $message,
-            RuntimeError::ERROR_CODE,
+            E\RuntimeError::ERROR_CODE,
             $severity,
             $file,
             $line
@@ -335,14 +250,14 @@ final class ErrorHandler{
         
         //convert to exception
         try{
-            throw new ShutdownError(
+            throw new E\ShutdownError(
                 $lasterror['message'],
-                ShutdownError::ERROR_CODE,
+                E\ShutdownError::ERROR_CODE,
                 $lasterror['type'],
                 $lasterror['file'],
                 $lasterror['line']
             );
-        }catch(ShutdownError $e){
+        }catch(E\ShutdownError $e){
             //we have to catch it to put it in handle as this is 
             //the shutdown.  But this normalizes the errors.
             $this->handleException($e);

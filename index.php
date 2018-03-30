@@ -4,14 +4,19 @@ use evo\errorhandler\ErrorHandler;
 error_reporting(-1);
 ini_set('display_errors', 1);
 
+echo "<pre>";
+
 if(!defined('EVO_AUTOLOAD')){
     define('EVO_AUTOLOAD', __DIR__.'/vendor/autoload.php');
 }
 
 require EVO_AUTOLOAD;
 
-http://localhost/Shutdown/index.php?config=C%3A%5CUniServerZ%5Cwww%5CShutdown%5Csrc%5Cevo%5Cshutdown%5CeJinnConf.php
-require __DIR__.'/vendor/evo/ejinn/index.php'; exit();
+if(isset($_GET['rebuild_eJinn'])){
+    define('EJINN_CONF_PATH', __DIR__.'/src/evo/shutdown/eJinnConf.php');  
+    require __DIR__.'/vendor/evo/ejinn/src/evo/ejinn/run.php';
+    exit();
+}
 
 echo "<pre>";
 

@@ -1,5 +1,5 @@
 <?php
-namespace evo\shutdown;
+namespace evo\shutdown\callback;
 
 /**
  *
@@ -9,7 +9,7 @@ namespace evo\shutdown;
  *
  * @author HughDurham {ArtisticPhoenix}
  * @package Evo
- * @subpackage ErrorHandler
+ * @subpackage Shutdown
  *
  */
 interface CallbackInterface{
@@ -54,16 +54,32 @@ interface CallbackInterface{
     /**
      * bitwise reporting level, simular to PHP's error_reporting()
      * 
-     * @return int
-     * 
+     * @return int 
+     */
+    public function getErrorReporting();
+    
+    /**
+     * bitwise reporting level, simular to PHP's error_reporting()
+     *
+     * @param int $level
+     *
      * @example <pre>
      * -1
      * E_ALL
      * E_ALL ^ E_DEPRECATED
-     * E_ERROR | E_WARNING 
+     * E_ERROR | E_WARNING
      */
-    public function getErrorReporting();
+    public function setErrorReporting($level);
     
-    public function setErrorReporting();
+    /**
+     * 
+     * @param string $message
+     * @param int $code
+     * @param string $filename
+     * @param int $lineno
+     * @param int $severity
+     * @param \Throwable $e - Throwable for PHP7+
+     */
+    public function run($message, $code, $filename, $lineno, $severity, $e);
     
 }
