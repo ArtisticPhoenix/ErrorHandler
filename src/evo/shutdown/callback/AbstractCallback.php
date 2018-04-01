@@ -145,9 +145,12 @@ abstract class AbstractCallback implements CallbackInterface
      * {@inheritDoc}
      * @see \evo\shutdown\callback\CallbackInterface::run()
      */
-    abstract public function run($message, $code, $severity, $filename, $lineno, $e, $arg1 = null);
+    abstract public function run($e, $arg1 = null);
+    
+    //========================== HELPERS =========================
     
     /**
+     * Based on the current error_reporting level and the Errors serverity can we handle this error
      *
      * @param int $severity
      * @return boolean
@@ -158,13 +161,27 @@ abstract class AbstractCallback implements CallbackInterface
         return (error_reporting() == -1 || $fatal & $severity || error_reporting() & $severity) ? true : false;
     }
 
+    /**
+     * Get the severity of this error
+     * 
+     * Unfortiantly PHP has several exeptions/error classes that dont provide a severity level
+     * We'll assum these are E_ERROR
+     * 
+     * @param \Exception $e
+     * @return int
+     */
+    protected function getSeverity($e)
+    {
+        
+    }
     
     /**
+     * Get a human readable name for a severity
      *
-     * @param int $severity
+     * @param \Exception $e
      * @return string
      */
-    protected function getSeverityName($severity)
+    protected function getSeverityName($e)
     {
         if (!isset($this->serverityNames[$severity])) {
             $severity = 1;

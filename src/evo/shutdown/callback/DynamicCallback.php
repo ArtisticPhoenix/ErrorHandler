@@ -45,7 +45,7 @@ class DynamicCallback extends AbstractCallback
      * {@inheritDoc}
      * @see \evo\shutdown\callback\AbstractCallback::run()
      */
-    public function run($message, $code, $severity, $filename, $lineno, $e, $arg1 = null)
+    public function run($e, $arg1 = null)
     {
         return call_user_func_array($this->callback, func_get_args());
     }

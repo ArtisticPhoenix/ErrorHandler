@@ -74,18 +74,9 @@ interface CallbackInterface
     
 
     /**
-     *
-     * @param string $message
-     * @param int $code
-     * @param int $severity - error level (error_reporting bitwise)
-     * @param string $filename
-     * @param int $lineno
-     * @param \Exception $e - @todo \Throwable after PHP7
-     * @param mixed $arg1 - additional args can follow
-     *
-     * @return bool - return true to singnal that the error was handled and prevent further callbacks for executing
-     *
-     *
+     * 
+     * @param \Exception
+     * @param mixed $arg1
      */
-    public function run($message, $code, $severity, $filename, $lineno, $e, $arg1 = null);
+    public function run($e, $arg1 = null);
 }

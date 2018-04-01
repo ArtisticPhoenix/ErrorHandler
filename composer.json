@@ -19,7 +19,9 @@
 	},
 	"require" : {
 		"php" : ">=5.6",
-		"evo/ejinn" : "dev-master"
+		"evo/ejinn" : "dev-master",
+		"evo/debug" : "dev-master",
+		"evo/patterns" : "dev-master"
 	},
 	"authors" : [{
 			"name" : "Hugh Durham III",
