@@ -74,7 +74,7 @@ interface CallbackInterface
     
 
     /**
-     * 
+     *
      * @param \Exception
      * @param mixed $arg1
      */

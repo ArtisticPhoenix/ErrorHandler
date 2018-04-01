@@ -163,16 +163,15 @@ abstract class AbstractCallback implements CallbackInterface
 
     /**
      * Get the severity of this error
-     * 
+     *
      * Unfortiantly PHP has several exeptions/error classes that dont provide a severity level
      * We'll assum these are E_ERROR
-     * 
+     *
      * @param \Exception $e
      * @return int
      */
     protected function getSeverity($e)
     {
-        
     }
     
     /**
