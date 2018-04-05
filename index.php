@@ -1,6 +1,7 @@
 <?php
 use evo\shutdown\ErrorHandler;
 use evo\shutdown\callback\DynamicCallback;
+use evo\debug\Debug;
 
 error_reporting(E_ALL ^ E_DEPRECATED);
 error_reporting(-1);
@@ -16,22 +17,25 @@ if(!defined('EVO_AUTOLOAD')){
 
 require EVO_AUTOLOAD;
 
-/*
+Debug::regesterFunctions();
+
 
 if(isset($_GET['rebuild_eJinn'])){
-    define('EJINN_CONF_PATH', __DIR__.'/src/evo/shutdown/eJinnConf.php');  
-    require __DIR__.'/vendor/evo/ejinn/src/evo/ejinn/run.php';
+    define('EJINN_CONF_PATH', __DIR__.'/eJinnConf.php'); 
+    $eJinnHome =  __DIR__.'/../ejinn/';
+    require $eJinnHome.'vendor/autoload.php';
+    require $eJinnHome.'src/evo/ejinn/run.php';
     exit();
 }
 
-echo "<pre>";*/
+echo "<pre>";
 
 
 
 $ErrorHandler = ErrorHandler::getInstance();
 
 
-
+//print_r(get_defined_constants(true));
 
 
 echo "Loaded\n";
@@ -55,6 +59,6 @@ $ErrorHandler->regesterCallback($A);*/
 trigger_error("Test", E_USER_DEPRECATED);
 
 
-echo "Complete";
+evo_debug_kill(0);
 
 ///

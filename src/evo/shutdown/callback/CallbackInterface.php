@@ -53,24 +53,12 @@ interface CallbackInterface
     public function setArgs(array $args);
     
     /**
-     * bitwise reporting level, simular to PHP's error_reporting()
-     *
-     * @return int
+     * can the callback handle this exception
+     * 
+     * @param \Throwable $e
+     * @return boolean
      */
-    public function getErrorReporting();
-    
-    /**
-     * bitwise reporting level, simular to PHP's error_reporting()
-     *
-     * @param int $level
-     *
-     * @example <pre>
-     * -1
-     * E_ALL
-     * E_ALL ^ E_DEPRECATED
-     * E_ERROR | E_WARNING
-     */
-    public function setErrorReporting($level);
+    public function canHandle($e);
     
 
     /**

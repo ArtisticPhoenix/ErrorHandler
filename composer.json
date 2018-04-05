@@ -19,7 +19,6 @@
 	},
 	"require" : {
 		"php" : ">=5.6",
-		"evo/ejinn" : "dev-master",
 		"evo/debug" : "dev-master",
 		"evo/patterns" : "dev-master"
 	},

@@ -7,12 +7,12 @@ namespace evo\shutdown\exception;
  *
  * @author ArtisticPhoenix
  * @package Evo
- * @subpackage exception
+ * @subpackage shutdown
  * @link https://github.com/ArtisticPhoenix/Shutdown/issues
  * @varsion 1.0.0
  * @eJinn:buildVersion 1.0.0
- * @eJinn:buildTime 1522395344.3061
+ * @eJinn:buildTime 1522902319.1518
  */
-interface ShutdownExceptionInterface
+interface EvoShutdownExceptionInterface
 {
 }

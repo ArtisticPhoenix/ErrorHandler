@@ -7,26 +7,26 @@ namespace evo\shutdown\exception;
  *
  * @author ArtisticPhoenix
  * @package Evo
- * @subpackage exception
+ * @subpackage shutdown
  * @link https://github.com/ArtisticPhoenix/Shutdown/issues
- * @varsion 1.0.0
+ * @version 1.0.0
  * @eJinn:buildVersion 1.0.0
- * @eJinn:buildTime 1522395344.3061
+ * @eJinn:buildTime 1522902637.0324
  */
-class InvalidCallback extends \ErrorException implements \evo\shutdown\exception\ShutdownExceptionInterface
+class EvoShutdown extends \ErrorException implements \evo\shutdown\exception\EvoShutdownExceptionInterface, \evo\exception\EvoExceptionInterface
 {
 
     /**
      * @var int
      */
-    const ERROR_CODE = 999;
+    const ERROR_CODE = 900;
 
     /**
      *
      * {@inheritDoc}
      * @see \ErrorException::__construct()
      */
-    public function __construct($message = "", $code = 999, $severity = 1, $filename = null, $lineno = null, \Exception $previous = null)
+    public function __construct($message = "", $code = 900, $severity = 1, $filename = null, $lineno = null, \Exception $previous = null)
     {
         parent::__construct($message, $code, $severity, $filename, $lineno, $previous);
     }
