@@ -12,7 +12,7 @@ namespace evo\shutdown\callback;
  * @subpackage Shutdown
  *
  */
-interface CallbackInterface
+interface ShutdownCallbackInterface
 {
     
     /**
@@ -21,6 +21,12 @@ interface CallbackInterface
      * @return string
      */
     public function getId();
+    
+    /**
+     *
+     * @param string $id
+     */
+    public function setId($id);
     
     /**
      * get the priority for this callback
@@ -53,18 +59,24 @@ interface CallbackInterface
     public function setArgs(array $args);
     
     /**
-     * can the callback handle this exception
-     * 
-     * @param \Throwable $e
-     * @return boolean
+     *
+     * returns one of the ENV_* constants
+     *
+     * @return string
      */
-    public function canHandle($e);
+    public function getEnvironment();
     
-
+    /**
+     * Set to one of the ENV_* constants
+     *
+     * @param string $environment
+     */
+    public function setEnvironment($environment);
+  
     /**
      *
      * @param \Exception
      * @param mixed $arg1
      */
-    public function run($e, $arg1 = null);
+    public function execute($e, $arg1 = null);
 }

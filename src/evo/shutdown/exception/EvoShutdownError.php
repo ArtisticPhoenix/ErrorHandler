@@ -11,9 +11,9 @@ namespace evo\shutdown\exception;
  * @link https://github.com/ArtisticPhoenix/Shutdown/issues
  * @version 1.0.0
  * @eJinn:buildVersion 1.0.0
- * @eJinn:buildTime 1522902637.0324
+ * @eJinn:buildTime 1522903380.5456
  */
-class EvoShutdown extends \ErrorException implements \evo\shutdown\exception\EvoShutdownExceptionInterface, \evo\exception\EvoExceptionInterface
+class EvoShutdownError extends \ErrorException implements \evo\shutdown\exception\EvoShutdownExceptionInterface, \evo\exception\EvoExceptionInterface
 {
 
     /**

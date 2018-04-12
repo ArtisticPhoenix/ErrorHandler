@@ -28,7 +28,7 @@ return [
                 'evo\\exception\\EvoExceptionInterface'
             ],
             "exceptions" => [
-                "900"   => "EvoShutdown",
+                "900"   => "EvoShutdownError",
                 "950"   => "EvoShutdownRuntimeError",
                 "999"   => "EvoShutdownInvalidCallback"
             ]

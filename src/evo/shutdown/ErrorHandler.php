@@ -1,11 +1,10 @@
 <?php
 namespace evo\shutdown;
 
-use evo\shutdown\Exception as E;
-use evo\shutdown\callback\CallbackInterface;
-use evo\shutdown\exception\InvalidCallback;
 use evo\pattern\singleton\SingletonInterface;
 use evo\pattern\singleton\SingletonTrait;
+use evo\shutdown\Exception as E;
+use evo\shutdown\callback\ShutdownCallbackInterface;
 
 /**
  *
@@ -23,12 +22,40 @@ use evo\pattern\singleton\SingletonTrait;
 final class ErrorHandler implements SingletonInterface
 {
     use SingletonTrait;
+    
+    /**
+     *
+     * @var string
+     */
+    const ENV_PRODUCTION = 'production';
+    
+    /**
+     *
+     * @var string
+     */
+    const ENV_TESTING = 'testing';
+    
+    /**
+     *
+     * @var string
+     */
+    const ENV_DEVELOPMENT = 'development';   
+    
     /**
      *
      * @var array
      */
     protected $callbacks = [];
     
+    /**
+     *
+     * @var bool
+     */
+    protected $alwaysConvertErrors = false;
+    
+    /**
+     * triggered on construct
+     */
     protected function init()
     {
         //regester out custom handlers.
@@ -39,15 +66,25 @@ final class ErrorHandler implements SingletonInterface
     
     /**
      *
-     * @param CallbackInterface $Callback
+     * @param bool $bool
+     */
+    public function alwaysConvertErrors($bool)
+    {
+        $this->alwaysConvertErrors = $bool;
+    }
+
+    
+    /**
+     *
+     * @param ShutdownCallbackInterface $Callback
      * @return boolean - can regester callback
      */
-    public function regesterCallback(CallbackInterface $Callback)
+    public function regesterCallback(ShutdownCallbackInterface $Callback)
     {
         $id = $Callback->getId();
         
         if (isset($this->callbacks[$id])) {
-            throw new InvalidCallback("Callback ID#{$id}# already regestered");
+            throw new E\EvoShutdownInvalidCallback("Callback ID#{$id}# already regestered");
         }
         
         $priority = $Callback->getPriority();
@@ -115,15 +152,15 @@ final class ErrorHandler implements SingletonInterface
     {
         if (!is_a($e, \Exception::class) && !is_a($e, '\\Error', false)) {
             //php 5.6 fallback.
-            throw new E\RuntimeError('Argument 1 passed to '.__METHOD__.' must be an instance of \Throwable');
+            throw new E\EvoShutdownRuntimeError('Argument 1 passed to '.__METHOD__.' must be an instance of \Throwable');
             return false;
         }
-
+        
         /*@var $callback CallbackInterface */
         foreach ($this->callbacks as $callback) {
             $args = [$e, $callback->getArgs()];
             
-            if ($callback->run(...$args)) {
+            if ($callback->execute(...$args)) {
                 return;
             }
         }
@@ -133,26 +170,26 @@ final class ErrorHandler implements SingletonInterface
 
     /**
      * throw exceptions for error regestered in error_reporting
-     * 
+     *
      * catching these errors depend on error_reporting settings (use at your own risk)
      *
      * @param int $severity
      * @param string $message
      * @param string $file
      * @param string $line
-     * 
+     *
      * @see http://php.net/manual/en/function.set-error-handler.php
      */
     public function handleError($severity, $message, $file = 'unknown', $line = 'unknown')
     {
-        if(error_reporting() == -1 || error_reporting() & $severity){
-            throw new E\RuntimeError(
+        if ($this->alwaysConvertErrors || error_reporting() == -1 || error_reporting() & $severity) {
+            throw new E\EvoShutdownRuntimeError(
                 $message,
-                E\RuntimeError::ERROR_CODE,
+                E\EvoShutdownRuntimeError::ERROR_CODE,
                 $severity,
                 $file,
                 $line
-            ); 
+            );
         }
         return false;
     }
@@ -164,17 +201,21 @@ final class ErrorHandler implements SingletonInterface
     {
         $lasterror = error_get_last();
         
-        if(error_reporting() == -1 || (isset($lasterror['type']) && error_reporting() & $lasterror['type'])){
+        if (is_null($lasterror)) {
+            return false;
+        }
+        
+        if ($this->alwaysConvertErrors || error_reporting() == -1 || error_reporting() & $lasterror['type']) {
             //convert to exception
             try {
-                throw new E\ShutdownError(
+                throw new E\EvoShutdownError(
                     $lasterror['message'],
-                    E\ShutdownError::ERROR_CODE,
+                    E\EvoShutdownError::ERROR_CODE,
                     $lasterror['type'],
                     $lasterror['file'],
                     $lasterror['line']
                 );
-            } catch (E\ShutdownError $e) {
+            } catch (E\EvoShutdownError $e) {
                 //we have to catch it to put it in handle as this is
                 //the shutdown.  But this normalizes the errors.
                 $this->handleException($e);
@@ -183,6 +224,4 @@ final class ErrorHandler implements SingletonInterface
         }
         return false;
     }
-    
-
 }

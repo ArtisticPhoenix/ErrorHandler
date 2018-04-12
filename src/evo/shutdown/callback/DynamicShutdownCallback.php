@@ -12,7 +12,7 @@ namespace evo\shutdown\callback;
  * @subpackage Shutdown
  *
  */
-class DynamicCallback extends AbstractCallback
+class DynamicShutdownCallback extends AbstractShutdownCallback
 {
     /**
      *
@@ -23,29 +23,15 @@ class DynamicCallback extends AbstractCallback
     /**
      *
      * @param callable $callback
-     * @param unknown $id
+     * @param string $id
      */
     public function __construct(callable $callback, $id = null)
     {
         $this->callback = $callback;
-        $this->id = is_null($id) ? $this->generateID() : $id;
+        $this->id = is_null($id) ? $this->generateId() : $id;
     }
 
-    /**
-     *
-     * @return string
-     */
-    protected function generateID()
-    {
-        return uniqid('', true);
-    }
-    
-    /**
-     *
-     * {@inheritDoc}
-     * @see \evo\shutdown\callback\AbstractCallback::run()
-     */
-    public function run($e, $arg1 = null)
+    public function execute($e, $arg1 = null)
     {
         return call_user_func_array($this->callback, func_get_args());
     }
