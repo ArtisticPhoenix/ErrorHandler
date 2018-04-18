@@ -64,11 +64,11 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
         //E_STRICT                => 'FATAL_ERROR',
     ];
     
-   /**
-    * 
-    * {@inheritDoc}
-    * @see \evo\shutdown\callback\ShutdownCallbackInterface::getId()
-    */
+    /**
+     *
+     * {@inheritDoc}
+     * @see \evo\shutdown\callback\ShutdownCallbackInterface::getId()
+     */
     public function getId()
     {
         if (!$this->id) {
@@ -78,11 +78,11 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
         return $this->id;
     }
     
-   /**
-    * 
-    * {@inheritDoc}
-    * @see \evo\shutdown\callback\ShutdownCallbackInterface::setId()
-    */
+    /**
+     *
+     * {@inheritDoc}
+     * @see \evo\shutdown\callback\ShutdownCallbackInterface::setId()
+     */
     public function setId($id)
     {
         $this->id = $id;
@@ -95,12 +95,14 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
      */
     protected function generateId($prefix=false)
     {
-        if(!$prefix) $prefix = get_called_class().'-';
+        if (!$prefix) {
+            $prefix = get_called_class().'-';
+        }
         return uniqid($prefix, true);
     }
     
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \evo\shutdown\callback\ShutdownCallbackInterface::getPriority()
      */
@@ -110,7 +112,7 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
     }
     
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \evo\shutdown\callback\ShutdownCallbackInterface::setPriority()
      */
@@ -120,7 +122,7 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
     }
     
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \evo\shutdown\callback\ShutdownCallbackInterface::getArgs()
      */
@@ -129,32 +131,34 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
         return $this->args;
     }
     
-   /**
-    * 
-    * {@inheritDoc}
-    * @see \evo\shutdown\callback\ShutdownCallbackInterface::setArgs()
-    */
+    /**
+     *
+     * {@inheritDoc}
+     * @see \evo\shutdown\callback\ShutdownCallbackInterface::setArgs()
+     */
     public function setArgs(array $args)
     {
         $this->args = $args;
     }
     
-   /**
-    * 
-    * {@inheritDoc}
-    * @see \evo\shutdown\callback\ShutdownCallbackInterface::getEnvironment()
-    */
-    public function getEnvironment(){
+    /**
+     *
+     * {@inheritDoc}
+     * @see \evo\shutdown\callback\ShutdownCallbackInterface::getEnvironment()
+     */
+    public function getEnvironment()
+    {
         return $this->environment;
     }
    
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \evo\shutdown\callback\ShutdownCallbackInterface::setEnvironment()
      */
-    public function setEnvironment($environment){
-        switch($environment){
+    public function setEnvironment($environment)
+    {
+        switch ($environment) {
             case ErrorHandler::ENV_DEVELOPMENT:
             case ErrorHandler::ENV_TESTING:
                 $this->environment = $environment;
@@ -174,38 +178,42 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
      * @param \Exception $e
      * @return string
      */
-    protected function getClass($e){
+    protected function getClass($e)
+    {
         $class = get_class($e);
         
-        if(ErrorHandler::ENV_PRODUCTION == $this->environment) return trim(strrchr('\\'.$class, '\\'), '\\');
+        if (ErrorHandler::ENV_PRODUCTION == $this->environment) {
+            return trim(strrchr('\\'.$class, '\\'), '\\');
+        }
         
-        return trim($class,'\\');
+        return trim($class, '\\');
     }
     
-   /**
-     * Can be used to remove stuff in a error message you'd rather not show,
-     * only removes content when Environment is ErrorHandler::ENV_PRODUCTION.
-     * This will replace any matched pair of # word #
-     *
-     * @example <pre>
-     * "File not found # home/yoursite/public_html/somefile.txt #"
-     * "File not found # home/yoursite/public_html # somefile.txt"
-     * "File not found # home/yoursite/public_html # somefile.txt "
-     * returns
-     * "File not found"
-     * "File not found somefile.txt"
-     *
-     * @param string $string
-     */
+    /**
+      * Can be used to remove stuff in a error message you'd rather not show,
+      * only removes content when Environment is ErrorHandler::ENV_PRODUCTION.
+      * This will replace any matched pair of # word #
+      *
+      * @example <pre>
+      * "File not found # home/yoursite/public_html/somefile.txt #"
+      * "File not found # home/yoursite/public_html # somefile.txt"
+      * "File not found # home/yoursite/public_html # somefile.txt "
+      * returns
+      * "File not found"
+      * "File not found somefile.txt"
+      *
+      * @param string $string
+      */
     protected function getMessage($e)
     {
         //convert " to '
         $message = str_replace('"', "'", $e->getMessage());
         
-        if(ErrorHandler::ENV_PRODUCTION == $this->environment)
+        if (ErrorHandler::ENV_PRODUCTION == $this->environment) {
             return trim(preg_replace('/\s*#(?:[^#]*+|(?0))*#\s*/', ' ', $message));
+        }
             
-            return $message;
+        return $message;
     }
 
     /**
@@ -213,8 +221,11 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
      * @param \ErrorException $e
      * @return string|mixed
      */
-    protected function getSeverity($e){
-        if (!method_exists($e, 'getSeverity')) return E_ERROR;
+    protected function getSeverity($e)
+    {
+        if (!method_exists($e, 'getSeverity')) {
+            return E_ERROR;
+        }
 
         return $e->getSeverity();
     }
@@ -228,7 +239,9 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
     {
         $severity = $this->getSeverity($e);
         
-        if (!isset(self::$errorTypes[$severity])) return 'UNKNOWN_ERROR';
+        if (!isset(self::$errorTypes[$severity])) {
+            return 'UNKNOWN_ERROR';
+        }
         
         return self::$errorTypes[$severity];
     }
@@ -238,7 +251,8 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
      * @param \ErrorException $e
      * @return string
      */
-    protected function getLine($e){
+    protected function getLine($e)
+    {
         return $e->getLine();
     }
     
@@ -247,28 +261,31 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
      * @param \ErrorException $e
      * @return string
      */
-    protected function getFile($e){
+    protected function getFile($e)
+    {
         return $e->getFile();
     }
     
     /**
      * Removes arguments from the stacktrace
      *    if the environment is not ErrorHandler::ENV_DEVELOPMENT
-     * 
+     *
      * Accepts any Throwable PHP7+
      * @param \ErrorException $e
      * @return string
      */
-    protected function getTraceAsString($e){
+    protected function getTraceAsString($e)
+    {
         $trace = $e->getTraceAsString();
-        if(ErrorHandler::ENV_DEVELOPMENT != $this->environment)
+        if (ErrorHandler::ENV_DEVELOPMENT != $this->environment) {
             return preg_replace('/\(.+\)$/m', '(...)', $trace);
+        }
 
-       return $trace;
+        return $trace;
     }
  
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \evo\shutdown\callback\ShutdownCallbackInterface::execute()
      */

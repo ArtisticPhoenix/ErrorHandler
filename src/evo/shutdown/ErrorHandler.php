@@ -39,7 +39,7 @@ final class ErrorHandler implements SingletonInterface
      *
      * @var string
      */
-    const ENV_DEVELOPMENT = 'development';   
+    const ENV_DEVELOPMENT = 'development';
     
     /**
      *
