@@ -19,8 +19,8 @@
 	},
 	"require" : {
 		"php" : ">=5.6",
-		"evo/debug" : "dev-master",
-		"evo/patterns" : "dev-master"
+		"evo/patterns" : "~1.0",
+		"evo/debug" : "dev-master"
 	},
 	"authors" : [{
 			"name" : "Hugh Durham III",
@@ -28,5 +28,6 @@
 			"homepage" : "http://www.artisticphoenix.com",
 			"role" : "Author"
 		}
-	]
+	],
+	"minimum-stability" : "dev"
 }
