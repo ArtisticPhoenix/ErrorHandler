@@ -3,15 +3,15 @@ namespace evo\exception;
 
 /**
  * (eJinn Generated File, do not edit directly)
- * Shutdow/Error/Exception handler
+ * Exception handler
  *
  * @author ArtisticPhoenix
  * @package Evo
- * @subpackage exception
+ * @subpackage Evo
  * @link https://github.com/ArtisticPhoenix/Shutdown/issues
- * @varsion 1.0.0
+ * @version 1.0.0
  * @eJinn:buildVersion 1.0.0
- * @eJinn:buildTime 1522902319.1518
+ * @eJinn:buildTime 1536031891.582
  */
 interface EvoExceptionInterface
 {

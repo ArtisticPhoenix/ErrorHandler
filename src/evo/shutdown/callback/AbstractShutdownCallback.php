@@ -1,293 +1,199 @@
 <?php
 namespace evo\shutdown\callback;
 
-use evo\shutdown\exception as E;
-use evo\shutdown\ErrorHandler;
+use evo\shutdown\Shutdown;
 
 /**
+ * Abstract Base class for shutdown callbacks
  *
- * (c) 2016 Hugh Durham III
+ * <i>(c) 2016 Hugh Durham III</i>
  *
- * For license information please view the LICENSE file included with this source code.
+ * For license information please view the <b>LICENSE</b> file included with this source code.
  *
- * @author HughDurham {ArtisticPhoenix}
+ * @author Hugh E. Durham III {ArtisticPhoenix}
  * @package Evo
  * @subpackage Shutdown
  *
  */
 abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
 {
-
+    
+    
     /**
+     * Development mode
+     *
+     * This is the least secure mode, but the one that
+     * diplays the most information.
+     *
+     * @var string
+     */
+    const ENV_DEVELOPMENT = 'development';
+    
+    /**
+     *
+     * @var string
+     */
+    const ENV_TESTING = 'testing';
+    
+    /**
+     *
+     * @var string
+     */
+    const ENV_PRODUCTION = 'production';
+  
+    /**
+     * Unique identigier  for each callback instance
      *
      * @var string
      */
     protected $id;
     
     /**
+     * It is up to each Child Object to impliment how it handles each Environment.
+     * 
+     * Generally these rules should be followed
+     * <ul>
+     *  <li><b>self::ENV_DEVELOPMENT</b> (development) - least secure, show full stacktraces, full error messages</li>
+     *  <li><b>self::ENV_TESTING</b>     (testing)     - moderately secure, show stacktraces without arguments, partial error messages</li>
+     *  <li><b>self::ENV_PRODUCTION</b>  (production)  - fully secure, no stacktraces, show minimal error messages</li>
+     * </ul> 
+     * 
+     * @var string
+     */
+    protected $environment;
+    
+    /**
+     * Callbacks are sorted by their priority and called in sequence lowest to highest
      *
      * @var int
      */
-    protected $priority = 100;
+    protected $priority;
     
     /**
+     * Additional arguments that can be stored in a Sub Class
+     * 
+     * All callbacks should happen within the scope of the Callback class
+     * Because of this these should always be accessable by using $this->args
+     * 
      * @var array
      */
-    protected $args = [];
-    
+    protected $args;
+
     /**
-     *
-     * @var string
+     * 
+     * @param string $id
+     * @param number $priority
      */
-    protected $environment = 'production';
-    
+    public function __construct($id, $environment = self::ENV_PRODUCTION, $priority=null, array $args = []){
+        $this->id = $id;
+        
+        if(!$priority) $priority = 100;
+        
+        $this->setEnvironment($environment);
+        $this->priority = $priority;
+        $this->args = $args;
+    }
+ 
     /**
-     * @var array
-     */
-    protected static $errorTypes = [
-        E_ERROR                 => 'FATAL_ERROR',
-        E_RECOVERABLE_ERROR     => 'RECOVERABLE_ERROR',
-        E_WARNING               => 'WARNING',
-        E_PARSE                 => 'PARSE_ERROR',
-        E_NOTICE                => 'NOTICE',
-        E_DEPRECATED            => 'DEPRECATED',
-        E_CORE_ERROR            => 'FATAL_ERROR',
-        E_CORE_WARNING          => 'WARNING',
-        E_COMPILE_ERROR         => 'COMPILE_ERROR',
-        E_COMPILE_WARNING       => 'COMPILE_WARNING',
-        E_USER_ERROR            => 'EVO_ERROR',
-        E_USER_WARNING          => 'EVO_WARNING',
-        E_USER_NOTICE           => 'EVO_NOTICE',
-        E_USER_DEPRECATED       => 'EVO_DEPRECATED',
-        //E_ALL                   => 'FATAL_ERROR',
-        //-1                      => 'FATAL_ERROR',
-        //E_STRICT                => 'FATAL_ERROR',
-    ];
-    
-    /**
-     *
+     * 
      * {@inheritDoc}
-     * @see \evo\shutdown\callback\ShutdownCallbackInterface::getId()
+     * @see ShutdownCallbackInterface::getId()
      */
     public function getId()
     {
-        if (!$this->id) {
-            throw new E\EvoShutdownInvalidCallback("No callback id defined");
-        }
-        
         return $this->id;
     }
     
     /**
+     * return the enviroment setting
      *
-     * {@inheritDoc}
-     * @see \evo\shutdown\callback\ShutdownCallbackInterface::setId()
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-      
-    /**
+     * self::ENV_* constants
      *
-     * @param string $prefix
      * @return string
      */
-    protected function generateId($prefix=false)
-    {
-        if (!$prefix) {
-            $prefix = get_called_class().'-';
-        }
-        return uniqid($prefix, true);
+    public function getEnvironment(){
+        return $this->environment;
     }
     
     /**
+     * It is up to each Child Object to impliment how it handles each Environment.
      *
+     * Generally these rules should be followed
+     * <ul>
+     *  <li><b>self::ENV_DEVELOPMENT</b> (development) - least secure, show full stacktraces, full error messages</li>
+     *  <li><b>self::ENV_TESTING</b>     (testing)     - moderately secure, show stacktraces without arguments, partial error messages</li>
+     *  <li><b>self::ENV_PRODUCTION</b>  (production)  - fully secure, no stacktraces, show minimal error messages</li>
+     * </ul>
+     *
+     * @return string
+     */
+    public function setEnvironment( $environment ){
+        $this->environment = $environment;
+    }
+    
+    /**
+     * 
      * {@inheritDoc}
-     * @see \evo\shutdown\callback\ShutdownCallbackInterface::getPriority()
+     * @see ShutdownCallbackInterface::getPriority()
      */
     public function getPriority()
     {
         return $this->priority;
     }
-    
-    /**
-     *
-     * {@inheritDoc}
-     * @see \evo\shutdown\callback\ShutdownCallbackInterface::setPriority()
-     */
-    public function setPriority($priority)
-    {
-        $this->priority = $priority;
-    }
-    
-    /**
-     *
-     * {@inheritDoc}
-     * @see \evo\shutdown\callback\ShutdownCallbackInterface::getArgs()
-     */
-    public function getArgs()
-    {
-        return $this->args;
-    }
-    
-    /**
-     *
-     * {@inheritDoc}
-     * @see \evo\shutdown\callback\ShutdownCallbackInterface::setArgs()
-     */
-    public function setArgs(array $args)
+        
+   /**
+    * 
+    * {@inheritDoc}
+    * @see ShutdownCallbackInterface::setArgs()
+    */
+    public function setArgs(array $args = [])
     {
         $this->args = $args;
     }
     
     /**
+     * Return the freeform arguments
      *
+     * @return array
+     */
+    public function getArgs()
+    {
+        return $this->args;
+    }
+
+    /**
+     * Set freeform arguments
+     *
+     * Freeform array of additional data that a callback can use
+     * It is up to each Child Object to implemnt thes
+     *
+     * @param array $args
+     */
+    public function setArg($key, $value)
+    {
+        $this->args[$key] = $value;
+    }
+    
+    /**
+     * Return a single argument by key or all arguments when null
+     *
+     *
+     * @param string $key
+     * @param mixed $default when element is not set return this instead
+     * @return array|false
+     */
+    public function getArg($key, $default=null)
+    {
+        if(!isset($this->args[$key])) return $default;
+        
+        return $this->args[$key];
+    }
+    
+    /**
+     * 
      * {@inheritDoc}
-     * @see \evo\shutdown\callback\ShutdownCallbackInterface::getEnvironment()
+     * @see ShutdownCallbackInterface::execute()
      */
-    public function getEnvironment()
-    {
-        return $this->environment;
-    }
-   
-    /**
-     *
-     * {@inheritDoc}
-     * @see \evo\shutdown\callback\ShutdownCallbackInterface::setEnvironment()
-     */
-    public function setEnvironment($environment)
-    {
-        switch ($environment) {
-            case ErrorHandler::ENV_DEVELOPMENT:
-            case ErrorHandler::ENV_TESTING:
-                $this->environment = $environment;
-                break;
-            case ErrorHandler::ENV_PRODUCTION:
-            default:
-                $this->environment = ErrorHandler::ENV_PRODUCTION;
-                break;
-        }
-    }
-    
-
-    //======================== Exception Wrapper Methods ===========================//
-    /**
-     * get the class, on production enviroment this removes the namespace
-     *
-     * @param \Exception $e
-     * @return string
-     */
-    protected function getClass($e)
-    {
-        $class = get_class($e);
-        
-        if (ErrorHandler::ENV_PRODUCTION == $this->environment) {
-            return trim(strrchr('\\'.$class, '\\'), '\\');
-        }
-        
-        return trim($class, '\\');
-    }
-    
-    /**
-      * Can be used to remove stuff in a error message you'd rather not show,
-      * only removes content when Environment is ErrorHandler::ENV_PRODUCTION.
-      * This will replace any matched pair of # word #
-      *
-      * @example <pre>
-      * "File not found # home/yoursite/public_html/somefile.txt #"
-      * "File not found # home/yoursite/public_html # somefile.txt"
-      * "File not found # home/yoursite/public_html # somefile.txt "
-      * returns
-      * "File not found"
-      * "File not found somefile.txt"
-      *
-      * @param string $string
-      */
-    protected function getMessage($e)
-    {
-        //convert " to '
-        $message = str_replace('"', "'", $e->getMessage());
-        
-        if (ErrorHandler::ENV_PRODUCTION == $this->environment) {
-            return trim(preg_replace('/\s*#(?:[^#]*+|(?0))*#\s*/', ' ', $message));
-        }
-            
-        return $message;
-    }
-
-    /**
-     * Accepts any Throwable PHP7+
-     * @param \ErrorException $e
-     * @return string|mixed
-     */
-    protected function getSeverity($e)
-    {
-        if (!method_exists($e, 'getSeverity')) {
-            return E_ERROR;
-        }
-
-        return $e->getSeverity();
-    }
-    
-    /**
-     * Accepts any Throwable PHP7+
-     * @param \ErrorException $e
-     * @return string
-     */
-    protected function getSeverityName($e)
-    {
-        $severity = $this->getSeverity($e);
-        
-        if (!isset(self::$errorTypes[$severity])) {
-            return 'UNKNOWN_ERROR';
-        }
-        
-        return self::$errorTypes[$severity];
-    }
-    
-    /**
-     * Accepts any Throwable PHP7+
-     * @param \ErrorException $e
-     * @return string
-     */
-    protected function getLine($e)
-    {
-        return $e->getLine();
-    }
-    
-    /**
-     * Accepts any Throwable PHP7+
-     * @param \ErrorException $e
-     * @return string
-     */
-    protected function getFile($e)
-    {
-        return $e->getFile();
-    }
-    
-    /**
-     * Removes arguments from the stacktrace
-     *    if the environment is not ErrorHandler::ENV_DEVELOPMENT
-     *
-     * Accepts any Throwable PHP7+
-     * @param \ErrorException $e
-     * @return string
-     */
-    protected function getTraceAsString($e)
-    {
-        $trace = $e->getTraceAsString();
-        if (ErrorHandler::ENV_DEVELOPMENT != $this->environment) {
-            return preg_replace('/\(.+\)$/m', '(...)', $trace);
-        }
-
-        return $trace;
-    }
- 
-    /**
-     *
-     * {@inheritDoc}
-     * @see \evo\shutdown\callback\ShutdownCallbackInterface::execute()
-     */
-    abstract public function execute($e, $arg1 = null);
+    abstract public function execute($e);
 }
+

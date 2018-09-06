@@ -2,81 +2,45 @@
 namespace evo\shutdown\callback;
 
 /**
+ * Interface for shutdown/error handlers.
  *
- * (c) 2016 Hugh Durham III
+ * <i>(c) 2016 Hugh Durham III</i>
  *
- * For license information please view the LICENSE file included with this source code.
+ * For license information please view the <b>LICENSE</b> file included with this source code.
  *
- * @author HughDurham {ArtisticPhoenix}
+ * @author Hugh E. Durham III {ArtisticPhoenix}
  * @package Evo
  * @subpackage Shutdown
  *
  */
 interface ShutdownCallbackInterface
 {
-    
     /**
      * Get the unique Identifier for this callback
+     * 
+     * The unique Id allows unregestiring a callback.
      *
      * @return string
      */
     public function getId();
-    
+
     /**
-     *
-     * @param string $id
-     */
-    public function setId($id);
-    
-    /**
-     * get the priority for this callback
+     * Get the priority for this callback
+     * 
+     * Callbacks are sorted by their priority and called in sequence lowest to highest
      *
      * @return int
      */
-    public function getPriority();
-    
+    public function getPriority();      
+
     /**
-     * set the priorty for this callback
-     *
-     * Sort order ASC, lower numbers execute first
-     *
-     * @param int $priority
-     */
-    public function setPriority($priority);
-    
-    /**
-     * return additional arguments for the callback
-     *
-     * @return array
-     */
-    public function getArgs();
-    
-    /**
-     * set additional args to be passed to the callback
-     *
-     * @param array $args
-     */
-    public function setArgs(array $args);
-    
-    /**
-     *
-     * returns one of the ENV_* constants
-     *
-     * @return string
-     */
-    public function getEnvironment();
-    
-    /**
-     * Set to one of the ENV_* constants
-     *
-     * @param string $environment
-     */
-    public function setEnvironment($environment);
-  
-    /**
+     * This is the functional part of the callback
+     * 
+     * It's the Child Object's resposibillity on rather or not it should handle a given error.
+     * return true from execute will halt execution of following callbacks (based on priority)
      *
      * @param \Exception
-     * @param mixed $arg1
+     * @return mixed
      */
-    public function execute($e, $arg1 = null);
+    public function execute($e);
 }

@@ -1,11 +1,13 @@
 <?php
-use evo\shutdown\ErrorHandler;
 use evo\debug\Debug;
 use evo\shutdown\callback\TextShutdownCallback;
+use evo\shutdown\Shutdown;
+use evo\shutdown\callback\ShutdownTextCallback;
+use evo\shutdown\callback\ShutdownDynamicCallback;
 
 //error_reporting(E_ALL ^ E_DEPRECATED);
-//error_reporting(-1);
-error_reporting(E_ALL ^ E_USER_DEPRECATED);
+error_reporting(-1);
+//error_reporting(E_ALL ^ E_USER_DEPRECATED);
 ini_set('display_errors', 1);
 
 //echo (error_reporting() & E_USER_DEPRECATED) ? 'true' : 'false';
@@ -20,44 +22,19 @@ require EVO_AUTOLOAD;
 
 Debug::regesterFunctions();
 
+$Shutdown = Shutdown::getInstance();
+//$Shutdown->regesterCallback(new ShutdownTextCallback('default', 100, ['enviroment' => &$enviroment]));
 
-if(isset($_GET['rebuild_eJinn'])){
-    define('EJINN_CONF_PATH', __DIR__.'/eJinnConf.php'); 
-    $eJinnHome =  __DIR__.'/../ejinn/';
-    require $eJinnHome.'vendor/autoload.php';
-    require $eJinnHome.'src/evo/ejinn/run.php';
-    exit();
-}
+$Shutdown->regesterCallback(new ShutdownDynamicCallback('dynamic', function($e){
+    print_r($this->args);
+},ShutdownDynamicCallback::ENV_DEVELOPMENT, 100));
 
-echo "<pre>";
+//$Shutdown->unRegesterShutdownHandler();
 
-/*
-array(6){
-	["file"] => string(36) "C:\\UniServerZ\\www\\Shutdown\\index.php",
-	["line"] => int(37),
-	["function"] => string(13) "getTraceFirst",
-	["class"] => string(15) "evo\\debug\\Debug",
-	["type"] => string(2) "->",
-	["args"] => array(0){},
-}
- */
-//evo_debug_dump(evo_debug_trace());
+trigger_error("Test Deprecated", E_USER_ERROR);
 
 
-//evo_debug_dump(evo_debug_backtrace());
-
-
-//evo_debug_dump(Debug::getInstance('functions')->getTraceFirst());
-
-//string(70) "Output from FILE[ C:\\UniServerZ\\www\\Shutdown\\index.php ] on LINE[ 38 ]"
-//evo_debug_dump(Debug::getInstance('functions')->getTraceFirstAsString());
-
-$ErrorHandler = ErrorHandler::getInstance();
-$ErrorHandler->alwaysConvertErrors(true);
-
-$ErrorHandler->regesterCallback(new TextShutdownCallback());
-
-define('EVO_ENVIROMENT', ErrorHandler::ENV_DEVELOPMENT);
+//$ErrorHandler->regesterCallback(new TextShutdownCallback());
 
 
 //print_r(get_defined_constants(true));
@@ -81,10 +58,10 @@ $ErrorHandler->regesterCallback($A);*/
 //trigger_error("Test Deprecated", E_USER_NOTICE);
 //trigger_error("Test Deprecated", E_USER_DEPRECATED);
 //trigger_error("Test Deprecated", E_USER_WARNING);
-trigger_error("Test Deprecated", E_USER_ERROR);
-throw new Exception('This is a test error', 3000);
+//trigger_error("Test Deprecated", E_USER_ERROR);
+//throw new Exception('This is a test error', 3000);
 
 
-evo_debug_kill(0);
+evo_debug_kill("Finished");
 
 ///
