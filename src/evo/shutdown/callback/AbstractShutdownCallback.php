@@ -1,7 +1,7 @@
 <?php
 namespace evo\shutdown\callback;
 
-use evo\shutdown\Shutdown;
+use evo\shutdown\traits\ExceptionModTrait;
 
 /**
  * Abstract Base class for shutdown callbacks
@@ -17,7 +17,7 @@ use evo\shutdown\Shutdown;
  */
 abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
 {
-    
+    use ExceptionModTrait;
     
     /**
      * Development mode
@@ -195,5 +195,10 @@ abstract class AbstractShutdownCallback implements ShutdownCallbackInterface
      * @see ShutdownCallbackInterface::execute()
      */
     abstract public function execute($e);
+    
+    
+    //==========================================
+    // avalible only in decendants of this class   
+    //==========================================
+ 
 }
-

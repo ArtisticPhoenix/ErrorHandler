@@ -1,6 +1,5 @@
 <?php
 use evo\debug\Debug;
-use evo\shutdown\callback\TextShutdownCallback;
 use evo\shutdown\Shutdown;
 use evo\shutdown\callback\ShutdownTextCallback;
 use evo\shutdown\callback\ShutdownDynamicCallback;
@@ -25,13 +24,32 @@ Debug::regesterFunctions();
 $Shutdown = Shutdown::getInstance();
 //$Shutdown->regesterCallback(new ShutdownTextCallback('default', 100, ['enviroment' => &$enviroment]));
 
+
 $Shutdown->regesterCallback(new ShutdownDynamicCallback('dynamic', function($e){
-    print_r($this->args);
+    print_r($this->getTraceAsString($e));
 },ShutdownDynamicCallback::ENV_DEVELOPMENT, 100));
 
-//$Shutdown->unRegesterShutdownHandler();
+$Shutdown->unRegisterHandler(Shutdown::HANDLE_ERROR);
 
-trigger_error("Test Deprecated", E_USER_ERROR);
+function a($a){
+   b(true,1.0,fopen('php://memory','w'));
+}
+
+function b($a,$e,$f){
+    c([1,2,3]);
+}
+
+function c($a){
+    d(new stdClass());
+}
+
+function d($a){
+    throw new \Exception();
+}
+
+a('foo');
+
+//trigger_error("Test Deprecated", E_USER_ERROR);
 
 
 //$ErrorHandler->regesterCallback(new TextShutdownCallback());

@@ -39,8 +39,8 @@ interface ShutdownCallbackInterface
      * It's the Child Object's resposibillity on rather or not it should handle a given error.
      * return true from execute will halt execution of following callbacks (based on priority)
      *
-     * @param \Exception
-     * @return mixed
+     * @param \Exception $e - @todo \Throwable after PHP7
+     * @return bool return true to signal the errror is handled and prevent other callbacks from executing
      */
     public function execute($e);
 }
