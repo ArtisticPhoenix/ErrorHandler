@@ -3,7 +3,7 @@ namespace evo\shutdown;
 
 use evo\pattern\singleton\SingletonInterface;
 use evo\pattern\singleton\SingletonTrait;
-use evo\shutdown\exception as E;
+use evo\exception as E;
 use evo\shutdown\callback\ShutdownCallbackInterface;
 use evo\shutdown\traits\ExceptionModTrait;
 
