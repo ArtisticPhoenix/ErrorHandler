@@ -31,25 +31,8 @@ $Shutdown->regesterCallback(new ShutdownDynamicCallback('dynamic', function($e){
 
 $Shutdown->unRegisterHandler(Shutdown::HANDLE_ERROR);
 
-function a($a){
-   b(true,1.0,fopen('php://memory','w'));
-}
 
-function b($a,$e,$f){
-    c([1,2,3]);
-}
-
-function c($a){
-    d(new stdClass());
-}
-
-function d($a){
-    throw new \Exception();
-}
-
-a('foo');
-
-//trigger_error("Test Deprecated", E_USER_ERROR);
+trigger_error("Test Deprecated", E_USER_ERROR);
 
 
 //$ErrorHandler->regesterCallback(new TextShutdownCallback());

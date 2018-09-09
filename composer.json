@@ -20,7 +20,8 @@
 	"require" : {
 		"php" : ">=5.6",
 		"evo/patterns" : "~1.0",
-		"evo/exception" : "dev-master"
+		"evo/exception" : "dev-master",
+		"evo/debug" : "~1.0"
 	},
 	"authors" : [{
 			"name" : "Hugh Durham III",

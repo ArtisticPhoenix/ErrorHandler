@@ -248,7 +248,7 @@ final class Shutdown implements SingletonInterface
      * @param unknown $which
      */
     protected function checkHandler($which){
-        if(!defined(__CLASS__.'::HANDLE_'.$which)) throw new E\ShutdownHandlerName();
+        if(!defined(__CLASS__.'::HANDLE_'.$which)) throw new E\InvalidArgument(__FUNCTION__.' expects one of the '.__CLASS__.'::HANDLE_* constants');
     }
     
     /**
@@ -275,9 +275,9 @@ final class Shutdown implements SingletonInterface
             //these will be caught by the exception callbak if not in a application try/catch block
             //if error handler is off, the exception handler will respct this and no handle the error
             //if the error makes it to the shutdown hanler it will respect the settings of the shutdown hanlder
-            throw new E\ShutdownRuntimeError(
+            throw new E\RuntimeError(
                 $message,
-                E\ShutdownRuntimeError::ERROR_CODE,
+                E\RuntimeError::ERROR_CODE,
                 $severity,
                 $file,
                 $line
